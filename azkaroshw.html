@@ -128,10 +128,8 @@
         alert('متصفحك لا يدعم الـ Service Workers.');
       }
     });
-  </script>
 
-  <!-- Service Worker -->
-  <script>
+    // تسجيل الـ Service Worker عند تحميل الصفحة
     if ('serviceWorker' in navigator) {
       navigator.serviceWorker.register('service-worker.js')
         .then(() => console.log('Service Worker registered successfully.'))
