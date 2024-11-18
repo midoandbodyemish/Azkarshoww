@@ -1,0 +1,167 @@
+<!DOCTYPE html>
+<html lang="ar">
+<head>
+  <link href="https://unpkg.com/webkul-micron@1.1.6/dist/css/micron.min.css" type="text/css" rel="stylesheet">
+<script src="https://unpkg.com/webkul-micron@1.1.6/dist/script/micron.min.js" type="text/javascript"></script>
+    <meta charset="UTF-8">
+    <title>تطبيق القرآن الكريم</title>
+    <style>
+        body { font-family: Arial, sans-serif; direction: rtl; text-align: center; }
+        img { 
+        width: 100%;
+        height: 96vh;
+        z-index:3;
+        }
+        input[type='search']{
+          height: 30px;
+          position: absolute;
+          top: 60px;
+          right: 70px;
+        }
+        #search{
+          height: 30px;
+          background: #a2ffd6;
+          position: absolute;
+          top: 60px;
+          right:260px;
+        }
+        #button{
+          margin: 4px;
+          display: none;
+        }
+        center{
+          border: 3px solid black;
+          margin: 4px;
+        }
+        #searsh{
+          display: none;
+          z-index: 10;
+        background: #ffee6e;
+        width: 100%;
+        height: 100vh;
+        position: absolute;
+        overflow: scroll;
+        }
+        #show{
+          z-index: 50;
+          position: absolute;
+          left: 160px;
+          top: 10px;
+          width:30px;
+          height: 30px;
+          text-align: center;
+        }
+        #y{
+          color: red;
+        }
+        #search-results{
+          position: absolute;
+          top: 100px;
+          
+          width: 100%;
+        }
+        #color{
+          position: absolute;
+          bottom: 10px;
+          z-index: 2;
+          width: 100px;
+          left: 10px;
+        }
+      /* #a3fffc - #faffa3c0 - #ffc6a3c0- #c1ffc6c2 - #e5c1ffcd - #ff8acacd*/
+    </style>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/hammer.js/2.0.8/hammer.min.js"></script>
+</head>
+<body>
+    <div id="searsh">
+    <input type="search" id="search-term" placeholder="ابحث عن آية...">
+    <button id="search"onclick="searchAyah()">بحث</button><br>
+    <div id="search-results"></div><br>
+    </div>
+    <button id="button"onclick="prevPage()">السابق</button>
+    <button id="button"onclick="nextPage()">التالي</button>
+    <div id="page-container">
+        <img id="page-image" alt="صفحة القرآن">
+    </div>
+    
+    <select id="color" onchange="changecolor();">
+      <option value="white">1</option>
+      <option value="#a3fffc">2</option>
+      <option value="#faffa3c0">3</option>
+      <option value="#ffc6a3c0">4</option>
+      <option value="#c1ffc6c2">5</option>
+      <option value="#e5c1ffcd">6</option>
+      <option value="#ff8acacd">7</option>
+    </select>
+ <button id="show" data-micron="squeeze">🔍</button>
+    <script>
+        let currentPage = localStorage.getItem('lastPage') ? parseInt(localStorage.getItem('lastPage')) : 1;
+        const totalPages = 604;
+
+        function updatePage() {
+            const imgElement = document.getElementById('page-image');
+            imgElement.src = `quran/page_${currentPage}.png`;
+            localStorage.setItem('lastPage', currentPage);
+        }
+
+        function prevPage() {
+            if (currentPage > 1) {
+                currentPage--;
+                updatePage();
+            }
+        }
+
+        function nextPage() {
+            if (currentPage < totalPages) {
+                currentPage++;
+                updatePage();
+            }
+        }
+
+        function searchAyah() {
+           const searchTerm = document.getElementById('search-term').value;
+            const resultsContainer = document.getElementById('search-results');
+            resultsContainer.innerHTML = '';
+            fetch("quran.json").then(response => response.json()).then(data => {
+              
+                    const results = data.filter(item => item.text.includes(searchTerm));
+                    results.forEach(result => {
+                        const resultElement = document.createElement('center');
+                        resultElement.textContent =/* `السورة: ${result.surah}, الآية: ${result.ayah}`;*/
+                        `${result.text}`;
+                        resultElement.onclick = () => {
+                            currentPage = result.page;
+                            updatePage();
+                            sear.style.display='none'
+                        };
+                        resultsContainer.appendChild(resultElement);
+                    });
+                    
+                });
+        }
+
+        const pageContainer = document.getElementById('page-container');
+        const hammer = new Hammer(pageContainer);
+
+        hammer.on('swipeleft', function() {
+            prevPage();
+        });
+
+        hammer.on('swiperight', function() {
+            nextPage();
+        });
+
+        updatePage();
+        var btnshow = document.getElementById('show');
+        var sear = document.getElementById('searsh');
+        btnshow.addEventListener('click',function(){
+          sear.style.display ='block'
+       });
+       btnshow.addEventListener('dblclick',function(){
+          sear.style.display ='none'
+       });
+       function changecolor(){
+        document.body.style.background = document.getElementById('color').value;
+      }
+    </script>
+</body>
+</html>
